@@ -7,7 +7,7 @@
     </nav>
     <div class="row">
         <div class="row justify-content-center" v-for="room in rooms" :key="room.id">
-            <RoomCard :roomName='room.name'/>
+            <RoomCard :room="room"/>
         </div>
     </div>
   </div>
