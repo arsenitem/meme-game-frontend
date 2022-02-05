@@ -4,11 +4,14 @@
                 <div class="card mt-5" style="max-width: 60rem;">
                     <div class="row">
                         <div class="col">
-
+                            Какие-то настройки
                         </div>
                         <div class="col md-5">
                             Список игроков
                         </div>
+                    </div>
+                    <div class="row">
+                        <button class="btn btn-primary" @click="onJoinClick">Начать игру</button>
                     </div>
                 </div>
          </div>
@@ -16,7 +19,7 @@
     </div>
 </template>
 
-<script>
+<script lang='ts'>
 import {defineComponent} from 'vue';
 export default defineComponent({
     computed: {
