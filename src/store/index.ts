@@ -2,7 +2,7 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-      username: '' as String,
+      username: localStorage.getItem('userName') || '' as String,
   },
   getters: {
     username: state => state.username,
@@ -11,6 +11,9 @@ export default createStore({
       setUsername: (state, username: String) => state.username = username,
   },
   actions: {
-    updateUsername:({commit}, username) => commit('setUsername', username),
+    updateUsername:({commit}, username) => {
+      commit('setUsername', username);
+      localStorage.setItem('userName', username);
+    },
   },
 })

@@ -25,7 +25,7 @@
     </div>
     <div class="row justify-content-md-center mt-5">
       <div class="col-md-2 align-self-center">
-        <button type="button" class="btn btn-warning" :disabled='btnDisabled' @click="onContineClick">Продолжить</button>
+        <button type="button" class="btn btn-warning" :disabled='btnDisabled' @click="onContineClick" style="width:100%">Продолжить</button>
       </div>
     </div>
   </div>
@@ -35,7 +35,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 export default defineComponent({
-  name: "App",
+  name: "UsernameInput",
   data() {
     return {
       username: "" as String,

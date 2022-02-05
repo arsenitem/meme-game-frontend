@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-
+import routeGuards from '../utils/routeGuards';
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
@@ -10,16 +10,19 @@ const routes: Array<RouteRecordRaw> = [
         path: '/rooms',
         name: 'RoomsList',
         component: () => import('../components/RoomsList.vue'),
+        beforeEnter: routeGuards.beforeEnter
     },
     {
         path: '/rooms/:id',
         name: 'Room',
-        component: () => import('../components/Room.vue')
+        component: () => import('../components/Room.vue'),
+        beforeEnter: routeGuards.beforeEnter
     },
     {
         path: '/rooms/:id/game',
         name: 'Room',
-        component: () => import('../components/Game/Game.vue')
+        component: () => import('../components/Game/Game.vue'),
+        beforeEnter: routeGuards.beforeEnter
     }
 ]
 
