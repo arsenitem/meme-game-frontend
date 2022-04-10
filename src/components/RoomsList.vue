@@ -6,7 +6,7 @@
         </div>
     </nav>
     <div class="row">
-        <div class="row justify-content-center" v-for="room in rooms" :key="room.id">
+        <div class="row justify-content-center" v-for="room in sessions" :key="room.id">
             <RoomCard :room="room"/>
         </div>
     </div>
@@ -17,17 +17,31 @@
 import {defineComponent} from 'vue';
 import RoomCard from './RoomCard.vue';
 export default defineComponent({
+    inject: ['$socket'],
+    data() {
+        return {
+            sessions: [],
+        }
+    },
     computed: {
         username() {
             return this.$store.getters['username']
         },
         rooms() {
-            return [{name: 'room1', id: 1}, {name: 'room2', id: 2}]
-            //return this.$store.getters['rooms']
+            return this.$store.getters['rooms']
         }
     },
     components: {
         RoomCard
+    },
+    created () {
+        this.$socket.on('session:list', (sessions: any) => {
+            console.log(sessions);
+            this.sessions = sessions;
+        })
+    },
+    mounted() {
+        this.$socket.emit('session:getList');
     }
 });
 </script>
