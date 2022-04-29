@@ -1,54 +1,71 @@
 <template>
   <div>
-    <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
-        <div class="align-left">
-            <span class="navbar-brand mb-0 h1">{{username}}</span>
-        </div>
-    </nav>
     <div class="row">
-        <div class="row justify-content-center" v-for="room in sessions" :key="room.id">
-            <RoomCard :room="room"/>
+      <div class="row justify-content-center">
+        <div class="card text-dark bg-light mb-2 mt-5" style="max-width: 40rem">
+          <div class="card-body">
+            <div class="row justify-content-center">
+              <div class="col-md-4">
+                <button class="btn btn-primary" @click="onCreateRoomClick">
+                  Создать комнату
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div
+        class="row justify-content-center"
+        v-for="room in sessions"
+        :key="room.id"
+      >
+        <RoomCard :room="room" />
+      </div>
     </div>
   </div>
 </template>
 
-<script lang='ts'>
-import {defineComponent} from 'vue';
-import RoomCard from './RoomCard.vue';
+<script lang="ts">
+import { defineComponent } from "vue";
+import RoomCard from "./RoomCard.vue";
 export default defineComponent({
-    inject: ['$socket'],
-    data() {
-        return {
-            sessions: [],
-        }
+  inject: ["$socket"],
+  data() {
+    return {
+      sessions: [],
+    };
+  },
+  components: {
+    RoomCard,
+  },
+  methods: {
+    onCreateRoomClick() {
+        this.$socket.emit('session:create', {name: "game"});
     },
-    computed: {
-        username() {
-            return this.$store.getters['username']
-        },
-        rooms() {
-            return this.$store.getters['rooms']
-        }
-    },
-    components: {
-        RoomCard
-    },
-    created () {
-        this.$socket.on('session:list', (sessions: any) => {
-            console.log(sessions);
-            this.sessions = sessions;
-        })
-    },
-    mounted() {
-        this.$socket.emit('session:getList');
-    }
+  },
+  created() {
+    this.$socket.on("session:list", (sessions: any) => {
+      this.sessions = sessions;
+    });
+    this.$socket.on("session:created", (session: any) => {
+      this.$socket.emit('player:join', {sessionId: session.id});
+      this.$router.push({name: 'Room', params: {id: session.id}});
+    });
+  },
+  unmounted() {
+    this.$socket.removeListener("session:list");
+  },
+  mounted() {
+    this.$socket.emit("session:getList");
+  },
 });
 </script>
 
 <style>
-    .align-left {
-        margin-left: auto;
-        margin-right: 0;
-    }
+.align-left {
+  margin-left: auto;
+  margin-right: 0;
+}
 </style>

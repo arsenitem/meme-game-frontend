@@ -20,7 +20,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: '/rooms/:id/game',
-        name: 'Room',
+        name: 'Game',
         component: () => import('../components/Game/Game.vue'),
         beforeEnter: routeGuards.beforeEnter
     }

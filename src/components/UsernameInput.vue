@@ -36,6 +36,7 @@
 import { defineComponent } from "vue";
 export default defineComponent({
   name: "UsernameInput",
+  inject: ["$socket"],
   data() {
     return {
       username: "" as String,
@@ -46,12 +47,20 @@ export default defineComponent({
           return this.username === ''
       }
   },
+  mounted() {
+    this.$socket.on("player:created", (player: any) => {
+      this.$store.commit('setUser', player);
+    });
+  },
   methods: {
       onContineClick() {
-          this.$store.dispatch('updateUsername', this.username);
-          this.$router.push({name: 'RoomsList'});
+        this.$socket.emit('player:create', {name: this.username});
+        this.$router.push({name: 'RoomsList'});
       }
-  }
+  },
+  unmounted() {
+    this.$socket.removeListener("player:created");
+  },
 });
 </script>
 

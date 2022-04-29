@@ -13,7 +13,6 @@
 </template>
 
 <script lang='ts'>
-import axios from 'axios';
 import {defineComponent} from 'vue';
 export default defineComponent({
     data() {
@@ -26,10 +25,10 @@ export default defineComponent({
         
     },
     mounted() {
-        axios.get('https://meme-api.herokuapp.com/gimme/10').then(({data}) => {
-            console.log(data)
-            this.cards = data.memes
-        })
+        // axios.get('https://meme-api.herokuapp.com/gimme/10').then(({data}) => {
+        //     console.log(data)
+        //     this.cards = data.memes
+        // })
     },
     methods: {
         show(card: any) {

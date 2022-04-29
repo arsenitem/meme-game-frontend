@@ -2,16 +2,22 @@
      <div class="container">
          <div class="row justify-content-center">
                 <div class="card mt-5" style="max-width: 60rem;">
+                    <div class="row justify-content-center">
+                        {{session.name}}
+                    </div>
                     <div class="row">
                         <div class="col">
                             Какие-то настройки
                         </div>
                         <div class="col md-5">
                             Список игроков
+                            <div class="row" v-for="player in session.players" :key="player.id">
+                                <p>{{player.name}}</p>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
-                        <button class="btn btn-primary" @click="onJoinClick">Начать игру</button>
+                        <button class="btn btn-primary" @click="onGameStart">Начать игру</button>
                     </div>
                 </div>
          </div>
@@ -22,11 +28,37 @@
 <script lang='ts'>
 import {defineComponent} from 'vue';
 export default defineComponent({
+    inject: ["$socket"],
+    data() {
+        return {
+            session: null,
+        }
+    },
     computed: {
-        roomId() {
+        sessionId() {
             return this.$route.params.id;
         }
-    }
+    },
+    methods: {
+        onGameStart() {
+            this.$socket.emit('session:start', {sessionId: this.sessionId });
+            this.$router.push({name: 'Game'});
+        }
+    },
+    mounted() {
+        console.log(this.sessionId);
+        this.$socket.emit('session:getStatus', {sessionId: this.sessionId })
+        console.log('must be emited')
+    },
+    created() {
+        this.$socket.on("session:status", (session: any) => {
+            this.session = session;
+            console.log('status', session)
+        });
+    },
+    unmounted() {
+        this.$socket.removeListener("session:status");
+    },
 
 });
 </script>
