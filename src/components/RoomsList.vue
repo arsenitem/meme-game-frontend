@@ -50,7 +50,6 @@ export default defineComponent({
       this.sessions = sessions;
     });
     this.$socket.on("session:created", (session: any) => {
-      this.$socket.emit('player:join', {sessionId: session.id});
       this.$router.push({name: 'Room', params: {id: session.id}});
     });
   },

@@ -1,7 +1,7 @@
 <template>
      <div class="container">
          <div class="row justify-content-center">
-                <div class="card mt-5" style="max-width: 60rem;">
+                <div class="card mt-5" style="max-width: 60rem;" v-if="session">
                     <div class="row justify-content-center">
                         {{session.name}}
                     </div>
@@ -41,7 +41,9 @@ export default defineComponent({
     },
     methods: {
         onGameStart() {
-            this.$socket.emit('session:start', {sessionId: this.sessionId });
+            setTimeout(() => {
+                this.$socket.emit('session:start', {sessionId: this.sessionId });
+            }, 400)     
             this.$router.push({name: 'Game'});
         }
     },
@@ -54,6 +56,9 @@ export default defineComponent({
         this.$socket.on("session:status", (session: any) => {
             this.session = session;
             console.log('status', session)
+        });
+        this.$socket.on("session:started", () => {
+            this.$router.push({name: 'Game'});
         });
     },
     unmounted() {

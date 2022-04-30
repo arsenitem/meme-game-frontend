@@ -23,6 +23,9 @@ export default defineComponent({
     },
   },
   mounted() {
+  },
+  beforeUnmout() {
+    localStorage.removeItem('userName');
   }
 })
 </script>

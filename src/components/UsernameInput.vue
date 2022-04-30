@@ -50,12 +50,12 @@ export default defineComponent({
   mounted() {
     this.$socket.on("player:created", (player: any) => {
       this.$store.commit('setUser', player);
+      this.$router.push({name: 'RoomsList'});
     });
   },
   methods: {
       onContineClick() {
         this.$socket.emit('player:create', {name: this.username});
-        this.$router.push({name: 'RoomsList'});
       }
   },
   unmounted() {

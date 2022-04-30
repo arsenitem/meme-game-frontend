@@ -1,15 +1,16 @@
 <template>
   <div>
-      <div class="row" style="height:70vh">
+      <div class="row" style="height:70vh" v-if="session">
+          <h2>{{session.game.activeQuestion.text}}</h2>
           <div class="col" style="border:2px solid">
               
           </div>
            <div class="col-md-3">
-               <players-list players/>
+               <players-list :players="playersList"/>
           </div>
       </div>
       <div class="row ml-4">
-            <user-cards/>
+            <user-cards :cards="cardsList"/>
     </div>
   </div>
 </template>
@@ -33,20 +34,24 @@ export default defineComponent({
         sessionId() {
             return this.$route.params.id;
         },
+        playersList() {
+            return this.session?.players;
+        },
+        cardsList() {
+            return this.session?.players?.find((p: any) => p.id === this.$socket.id)._cards;
+        }
     },
     mounted() {
-        console.log(this.sessionId);
-        this.$socket.emit('session:getStatus', {sessionId: this.sessionId })
-        console.log('must be emited')
+        
     },
     created() {
-        this.$socket.on("session:status", (session: any) => {
+        this.$socket.on("session:updated", (session: any) => {
             this.session = session;
             console.log('status', session)
         });
     },
     unmounted() {
-        this.$socket.removeListener("session:status");
+        this.$socket.removeListener("session:updated");
     },
 });
 </script>

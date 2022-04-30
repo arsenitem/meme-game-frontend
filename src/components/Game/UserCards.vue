@@ -3,9 +3,9 @@
       <div class="preview-mem" v-if="preview">
          <img :src="preview" height="400" width="400">
      </div>
-      <template v-for="card in cards" :key="card.ups">
+      <template v-for="card in cards" :key="card.id">
          <div class="card ms-3 meme-card" style="width:100px;height:160px">
-            <img :src="card.url" height="160" width="100" @mouseover="show(card)" @mouseleave="clear">
+            <img :src="card.link" height="160" width="100" @mouseover="show(card)" @mouseleave="clear">
          </div>
       </template>
      
@@ -15,9 +15,9 @@
 <script lang='ts'>
 import {defineComponent} from 'vue';
 export default defineComponent({
+    props: ['cards'],
     data() {
         return {
-            cards: [],
             preview: ''
         }
     },
@@ -32,7 +32,7 @@ export default defineComponent({
     },
     methods: {
         show(card: any) {
-            this.preview = card.url
+            this.preview = card.link
         },
         clear() {
              this.preview =''

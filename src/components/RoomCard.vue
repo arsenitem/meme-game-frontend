@@ -50,7 +50,7 @@ export default defineComponent({
     },
     computed: {
         gameStatus() {
-            return this.room.game.round > 0 ? `Идет игра(Раунд ${this.game.round})` : "Ожидание игроков";
+            return this.room?.game?.round > 0 ? `Идет игра(Раунд ${this.room?.game?.round})` : "Ожидание игроков";
         }
     },
     methods: {
