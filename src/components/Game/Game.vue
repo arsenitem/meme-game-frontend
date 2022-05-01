@@ -1,16 +1,18 @@
 <template>
   <div>
-      <div class="row" style="height:70vh" v-if="session">
-          <h2>{{session.game.activeQuestion.text}}</h2>
+      <h2>{{session.game.activeQuestion.text}}</h2>
+      <div class="row" style="height:65vh" v-if="session">
           <div class="col" style="border:2px solid">
-              
+              <div v-for="card in pickedCards" :key="card.id" class="pickedCard" @click="onVoteCardClick(card.id)">
+                  card
+              </div>
           </div>
            <div class="col-md-3">
                <players-list :players="playersList"/>
           </div>
       </div>
       <div class="row ml-4">
-            <user-cards :cards="cardsList"/>
+            <user-cards :cards="cardsList" @cardPick="onCardPick"/>
     </div>
   </div>
 </template>
@@ -28,6 +30,7 @@ export default defineComponent({
     data() {
         return {
             session: null,
+            cardPicked: false,
         }
     },
     computed: {
@@ -39,6 +42,17 @@ export default defineComponent({
         },
         cardsList() {
             return this.session?.players?.find((p: any) => p.id === this.$socket.id)._cards;
+        },
+        pickedCards() {
+            return this.session?.game?.roundCards;
+        }
+    },
+    methods: {
+        onCardPick(cardId: string) {
+            this.$socket.emit('session:pickCard', {sessionId: this.sessionId, cardId});
+        },
+        onVoteCardClick(cardId: string) {
+            this.$socket.emit('session:voteCard', {sessionId: this.sessionId, cardId});
         }
     },
     mounted() {
@@ -57,5 +71,12 @@ export default defineComponent({
 </script>
 
 <style>
-
+    .pickedCard {
+        width: 100px;
+        height: 160px;
+        float: left;
+        background-color: gainsboro;
+        padding: 5px;
+        margin: 15px;
+    }
 </style>

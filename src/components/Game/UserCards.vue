@@ -5,7 +5,7 @@
      </div>
       <template v-for="card in cards" :key="card.id">
          <div class="card ms-3 meme-card" style="width:100px;height:160px">
-            <img :src="card.link" height="160" width="100" @mouseover="show(card)" @mouseleave="clear">
+            <img :src="card.link" height="160" width="100" @mouseover="show(card)" @mouseleave="clear" @click="onCardSelect(card.id)">
          </div>
       </template>
      
@@ -36,6 +36,9 @@ export default defineComponent({
         },
         clear() {
              this.preview =''
+        },
+        onCardSelect(cardId: string) {
+            this.$emit('cardPick', cardId);
         }
     }
 
