@@ -1,7 +1,14 @@
 <template>
 <div>
     <div class="card mt-2" v-for="player in players" :key="player.id">
-        {{player.name}}
+        <div class="row">
+            <div class="col">
+                {{player.name}}
+            </div>
+            <div class="col">
+                {{player.score}}
+            </div>
+        </div>
     </div>
 </div>
   

@@ -43,12 +43,10 @@ export default defineComponent({
         onGameStart() {
             setTimeout(() => {
                 this.$socket.emit('session:start', {sessionId: this.sessionId });
-            }, 400)     
-            this.$router.push({name: 'Game'});
+            }, 400)
         }
     },
     mounted() {
-        console.log(this.sessionId);
         this.$socket.emit('session:getStatus', {sessionId: this.sessionId })
         console.log('must be emited')
     },
@@ -63,6 +61,7 @@ export default defineComponent({
     },
     unmounted() {
         this.$socket.removeListener("session:status");
+        this.$socket.removeListener("session:started");
     },
 
 });

@@ -1,13 +1,21 @@
 <template>
-  <div>
+  <div v-if="session">
       <h2>{{session.game.activeQuestion.text}}</h2>
-      <div class="row" style="height:65vh" v-if="session">
+      <div class="row" style="height:65vh">
           <div class="col" style="border:2px solid">
               <div v-for="card in pickedCards" :key="card.id" class="pickedCard" @click="onVoteCardClick(card.id)">
-                  card
+                  <div v-if="roundStatus === 'voting' || roundStatus === 'beforeRound'">
+                      <img :src="card.link" height="160" width="100"/>
+                      <div>{{card.votes}}</div>
+                  </div>
+                  <div v-if="roundStatus === 'picking'">
+                      <!-- <img height="160" width="100"> -->
+                  </div>
               </div>
           </div>
            <div class="col-md-3">
+               <h2>Раунд {{round}}</h2>
+               <h2>{{roundStatus}}({{remainingTime}})</h2>
                <players-list :players="playersList"/>
           </div>
       </div>
@@ -31,6 +39,7 @@ export default defineComponent({
         return {
             session: null,
             cardPicked: false,
+            remainingTime: 60,
         }
     },
     computed: {
@@ -45,6 +54,23 @@ export default defineComponent({
         },
         pickedCards() {
             return this.session?.game?.roundCards;
+        },
+        round() {
+            return this.session?.game?.round;
+        },
+        roundStatus() {
+            return this.session?.game?.roundStatus;
+        }
+    },
+    watch: {
+        roundStatus(val, old) {
+            console.log(val, old);
+            const interaval = setInterval(() => {
+                this.remainingTime--
+            }, 1000)
+            if (this.remainingTime === 0) {
+                clearInterval(interaval);
+            }
         }
     },
     methods: {
@@ -55,17 +81,26 @@ export default defineComponent({
             this.$socket.emit('session:voteCard', {sessionId: this.sessionId, cardId});
         }
     },
-    mounted() {
+    created() {
+        this.$nextTick(() => {
+            this.$socket.on("session:status", (session: any) => {
+                this.session = session;
+                console.log('status', session)
+            });
+        })
         
     },
-    created() {
-        this.$socket.on("session:updated", (session: any) => {
-            this.session = session;
-            console.log('status', session)
-        });
+    mounted() {
+        console.log('get session status')
+        console.log(this.$socket)
+        this.$socket.emit('session:getStatus', {sessionId: this.sessionId });
+        // this.$socket.on("session:status", (session: any) => {
+        //     this.session = session;
+        //     console.log('status', session)
+        // });
     },
     unmounted() {
-        this.$socket.removeListener("session:updated");
+        //this.$socket.removeListener("session:status");
     },
 });
 </script>
