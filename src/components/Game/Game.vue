@@ -5,7 +5,7 @@
           <div class="col" style="border:2px solid">
               <div v-for="card in pickedCards" :key="card.id" class="pickedCard" @click="onVoteCardClick(card.id)">
                   <div v-if="roundStatus === 'voting' || roundStatus === 'beforeRound'">
-                      <img :src="card.link" height="160" width="100"/>
+                      <img :src="card.link" height="240" width="150"/>
                       <div>{{card.votes}}</div>
                   </div>
                   <div v-if="roundStatus === 'picking'">
@@ -40,6 +40,12 @@ export default defineComponent({
             session: null,
             cardPicked: false,
             remainingTime: 60,
+            timer: null,
+            statusTimeMap: {
+                'picking': 'roundTime',
+                'voting': 'voteTime',
+                'beforeRound': 'beforeNextRoundTime'
+            }
         }
     },
     computed: {
@@ -63,13 +69,17 @@ export default defineComponent({
         }
     },
     watch: {
-        roundStatus(val, old) {
-            console.log(val, old);
-            const interaval = setInterval(() => {
-                this.remainingTime--
+        roundStatus(val) {
+            clearInterval(this.interval);
+            this.remainingTime = this.session.settings[this.statusTimeMap[val]]
+            this.interval = setInterval(() => {
+                this.remainingTime--;
             }, 1000)
-            if (this.remainingTime === 0) {
-                clearInterval(interaval);
+        },
+        remainingTime(val) {
+            console.log(val);
+            if (val === 0) {
+                clearInterval(this.interval);
             }
         }
     },
@@ -107,8 +117,8 @@ export default defineComponent({
 
 <style>
     .pickedCard {
-        width: 100px;
-        height: 160px;
+        width: 150px;
+        height: 240px;
         float: left;
         background-color: gainsboro;
         padding: 5px;

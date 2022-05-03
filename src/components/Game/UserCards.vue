@@ -51,7 +51,7 @@ export default defineComponent({
     }
     .preview-mem {
         position: absolute;
-        margin-top: -300px;
+        margin-top: -450px;
         margin-left: 300px;
         z-index: 100;
     }
