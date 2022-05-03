@@ -1,127 +1,163 @@
 <template>
   <div v-if="session">
-      <h2>{{session.game.activeQuestion.text}}</h2>
-      <div class="row" style="height:65vh">
-          <div class="col" style="border:2px solid">
-              <div v-for="card in pickedCards" :key="card.id" class="pickedCard" @click="onVoteCardClick(card.id)">
-                  <div v-if="roundStatus === 'voting' || roundStatus === 'beforeRound'">
-                      <img :src="card.link" height="240" width="150"/>
-                      <div>{{card.votes}}</div>
-                  </div>
-                  <div v-if="roundStatus === 'picking'">
-                      <!-- <img height="160" width="100"> -->
-                  </div>
-              </div>
+    <h2>{{ session.game.activeQuestion.text }}</h2>
+    <div class="row" style="height: 65vh">
+      <div class="col" style="border: 2px solid">
+        <div v-if="preview">
+          <img :src="preview" height="400" width="400" class="preview" />
+        </div>
+        <div
+          v-for="card in pickedCards"
+          :key="card.id"
+          class="pickedCard"
+          @click="onVoteCardClick(card.id)"
+        >
+          <div v-if="roundStatus === 'voting' || roundStatus === 'beforeRound'">
+            <img
+              :src="card.link"
+              height="240"
+              width="150"
+              @mouseover="show(card)"
+              @mouseleave="clear"
+            />
+            <div>{{ card.votes }}</div>
           </div>
-           <div class="col-md-3">
-               <h2>Раунд {{round}}</h2>
-               <h2>{{roundStatus}}({{remainingTime}})</h2>
-               <players-list :players="playersList"/>
+          <div v-if="roundStatus === 'picking'">
+            <!-- <img height="160" width="100"> -->
           </div>
+        </div>
       </div>
-      <div class="row ml-4">
-            <user-cards :cards="cardsList" @cardPick="onCardPick"/>
+      <div class="col-md-3">
+        <h2>Раунд {{ round }}</h2>
+        <h2>{{ roundStatus }}({{ remainingTime }})</h2>
+        <players-list :players="playersList" />
+      </div>
+    </div>
+    <div class="row ml-4">
+      <user-cards :cards="cardsList" @cardPick="onCardPick" />
     </div>
   </div>
 </template>
 
-<script lang='ts'>
-import {defineComponent} from 'vue';
-import UserCards from './UserCards.vue';
-import PlayersList from './PlayersList.vue';
+<script lang="ts">
+import { defineComponent } from "vue";
+import UserCards from "./UserCards.vue";
+import PlayersList from "./PlayersList.vue";
 export default defineComponent({
-    inject: ["$socket"],
-    components: {
-        UserCards,
-        PlayersList
+  inject: ["$socket"],
+  components: {
+    UserCards,
+    PlayersList,
+  },
+  data() {
+    return {
+      session: null,
+      cardPicked: false,
+      remainingTime: 60,
+      timer: null,
+      preview: null,
+      statusTimeMap: {
+        picking: "roundTime",
+        voting: "voteTime",
+        beforeRound: "beforeNextRoundTime",
+      },
+    };
+  },
+  computed: {
+    sessionId() {
+      return this.$route.params.id;
     },
-    data() {
-        return {
-            session: null,
-            cardPicked: false,
-            remainingTime: 60,
-            timer: null,
-            statusTimeMap: {
-                'picking': 'roundTime',
-                'voting': 'voteTime',
-                'beforeRound': 'beforeNextRoundTime'
-            }
-        }
+    playersList() {
+      return this.session?.players;
     },
-    computed: {
-        sessionId() {
-            return this.$route.params.id;
-        },
-        playersList() {
-            return this.session?.players;
-        },
-        cardsList() {
-            return this.session?.players?.find((p: any) => p.id === this.$socket.id)._cards;
-        },
-        pickedCards() {
-            return this.session?.game?.roundCards;
-        },
-        round() {
-            return this.session?.game?.round;
-        },
-        roundStatus() {
-            return this.session?.game?.roundStatus;
-        }
+    cardsList() {
+      return this.session?.players?.find((p: any) => p.id === this.$socket.id)
+        ._cards;
     },
-    watch: {
-        roundStatus(val) {
-            clearInterval(this.interval);
-            this.remainingTime = this.session.settings[this.statusTimeMap[val]]
-            this.interval = setInterval(() => {
-                this.remainingTime--;
-            }, 1000)
-        },
-        remainingTime(val) {
-            console.log(val);
-            if (val === 0) {
-                clearInterval(this.interval);
-            }
-        }
+    pickedCards() {
+      return this.session?.game?.roundCards;
     },
-    methods: {
-        onCardPick(cardId: string) {
-            this.$socket.emit('session:pickCard', {sessionId: this.sessionId, cardId});
-        },
-        onVoteCardClick(cardId: string) {
-            this.$socket.emit('session:voteCard', {sessionId: this.sessionId, cardId});
-        }
+    round() {
+      return this.session?.game?.round;
     },
-    created() {
-        this.$nextTick(() => {
-            this.$socket.on("session:status", (session: any) => {
-                this.session = session;
-                console.log('status', session)
-            });
-        })
-        
+    roundStatus() {
+      return this.session?.game?.roundStatus;
     },
-    mounted() {
-        console.log('get session status')
-        console.log(this.$socket)
-        this.$socket.emit('session:getStatus', {sessionId: this.sessionId });
-        // this.$socket.on("session:status", (session: any) => {
-        //     this.session = session;
-        //     console.log('status', session)
-        // });
+  },
+  watch: {
+    roundStatus(val) {
+      clearInterval(this.interval);
+      this.remainingTime = this.session.settings[this.statusTimeMap[val]];
+      this.interval = setInterval(() => {
+        this.remainingTime--;
+      }, 1000);
     },
-    unmounted() {
-        //this.$socket.removeListener("session:status");
+    remainingTime(val) {
+      console.log(val);
+      if (val === 0) {
+        clearInterval(this.interval);
+      }
     },
+    pickedCards(cards) {
+      if (cards.length === 0) {
+        this.preview = null;
+      }
+    },
+  },
+  methods: {
+    onCardPick(cardId: string) {
+      this.$socket.emit("session:pickCard", {
+        sessionId: this.sessionId,
+        cardId,
+      });
+    },
+    onVoteCardClick(cardId: string) {
+      this.$socket.emit("session:voteCard", {
+        sessionId: this.sessionId,
+        cardId,
+      });
+    },
+    show(card: any) {
+      this.preview = card.link;
+    },
+    clear() {
+      this.preview = null;
+    },
+  },
+  created() {
+    this.$nextTick(() => {
+      this.$socket.on("session:status", (session: any) => {
+        this.session = session;
+        console.log("status", session);
+      });
+    });
+  },
+  mounted() {
+    console.log("get session status");
+    console.log(this.$socket);
+    this.$socket.emit("session:getStatus", { sessionId: this.sessionId });
+    // this.$socket.on("session:status", (session: any) => {
+    //     this.session = session;
+    //     console.log('status', session)
+    // });
+  },
+  unmounted() {
+    //this.$socket.removeListener("session:status");
+  },
 });
 </script>
 
 <style>
-    .pickedCard {
-        width: 150px;
-        height: 240px;
-        float: left;
-        background-color: gainsboro;
-        padding: 5px;
-        margin: 15px;
-    }
+.pickedCard {
+  width: 150px;
+  height: 240px;
+  float: left;
+  background-color: gainsboro;
+  padding: 5px;
+  margin: 15px;
+}
+.preview {
+  position: absolute;
+  margin-left: 300px;
+}
 </style>
