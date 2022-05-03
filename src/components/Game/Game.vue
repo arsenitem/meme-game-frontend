@@ -1,6 +1,6 @@
 <template>
   <div v-if="session">
-    <h2>{{ session.game.activeQuestion.text }}</h2>
+    <h2 class="roundQuestion">{{ session.game.activeQuestion.text }}</h2>
     <div class="row" style="height: 65vh">
       <div class="col" style="border: 2px solid">
         <div v-if="preview">
@@ -93,7 +93,6 @@ export default defineComponent({
       }, 1000);
     },
     remainingTime(val) {
-      console.log(val);
       if (val === 0) {
         clearInterval(this.interval);
       }
@@ -159,5 +158,8 @@ export default defineComponent({
 .preview {
   position: absolute;
   margin-left: 300px;
+}
+.roundQuestion {
+    height: 60px;
 }
 </style>
