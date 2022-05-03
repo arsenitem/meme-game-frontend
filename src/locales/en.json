@@ -1,0 +1,14 @@
+{
+    "welcome": "Welcome to Memer!",
+    "input-name": "Type your name:",
+    "name-placeholder": "Your name",
+    "continue": "Continue",
+    "create-room": "Create room",
+    "join": "Join",
+    "player-list": "Player list",
+    "start-game": "Start game",
+    "round": "Round",
+    "picking": "Picking",
+    "voting": "Voting",
+    "before-next-round": "Next round in"
+}

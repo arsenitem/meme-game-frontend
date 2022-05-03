@@ -1,0 +1,14 @@
+{
+    "welcome": "Добро пожаловать в Memer!",
+    "input-name": "Введите свое имя:",
+    "name-placeholder": "Ваше имя",
+    "continue": "Продолжить",
+    "create-room": "Создать комнату",
+    "join": "Присоединиться",
+    "player-list": "Список игроков",
+    "start-game": "Начать игру",
+    "round": "Раунд",
+    "picking": "Идет выбор",
+    "voting": "Идет голосование",
+    "before-next-round": "До следующего раунда"
+}
