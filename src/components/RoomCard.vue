@@ -24,7 +24,7 @@
             </div>
             <div class="row justify-content-center">
                 <div class="col-md-4">
-                    <button class="btn btn-primary" @click="onJoinClick">Присоедениться</button>
+                    <button class="btn btn-primary" @click="onJoinClick">Присоединиться</button>
                 </div>    
             </div>
         </div>
