@@ -17,7 +17,10 @@
                         </div>
                     </div>
                     <div class="row">
-                        <button class="btn btn-primary" @click="onGameStart">Начать игру</button>
+                        <button class="btn btn-primary" @click="onGameStart" >Начать игру</button>
+                    </div>
+                    <div class="row">
+                        <button class="btn btn-primary" @click="onGameJoin" v-show=btnVisible>Присоединиться к игре</button>
                     </div>
                 </div>
          </div>
@@ -32,6 +35,7 @@ export default defineComponent({
     data() {
         return {
             session: null,
+            btnVisible:false,
         }
     },
     computed: {
@@ -44,11 +48,16 @@ export default defineComponent({
             setTimeout(() => {
                 this.$socket.emit('session:start', {sessionId: this.sessionId });
             }, 400)
-        }
+        },
+       
     },
     mounted() {
         this.$socket.emit('session:getStatus', {sessionId: this.sessionId })
-        console.log('must be emited')
+        console.log('must be emited');
+        this.$socket.emit('session:started', { })
+        this.btnVisible=true;
+        
+
     },
     created() {
         this.$socket.on("session:status", (session: any) => {
@@ -58,6 +67,7 @@ export default defineComponent({
         this.$socket.on("session:started", () => {
             this.$router.push({name: 'Game'});
         });
+      
     },
     unmounted() {
         this.$socket.removeListener("session:status");
