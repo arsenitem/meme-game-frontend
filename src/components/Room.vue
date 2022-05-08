@@ -17,7 +17,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <button class="btn btn-primary" @click="onGameStart" >Начать игру</button>
+                        <button class="btn btn-primary" @click="onGameStart" v-if="isHost">Начать игру</button>
                     </div>
                     <div class="row">
                         <button class="btn btn-primary" @click="onGameJoin" v-show="btnVisible">Присоединиться к игре</button>
@@ -41,6 +41,9 @@ export default defineComponent({
     computed: {
         sessionId() {
             return this.$route.params.id;
+        },
+        isHost() {
+            return this.$socket.id === this.session?.host?.id;
         }
     },
     methods: {

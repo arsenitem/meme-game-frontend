@@ -57,7 +57,12 @@ export default defineComponent({
         onJoinClick() {
             console.log(this.room.id)
             this.$socket.emit('player:join', {sessionId: this.room.id});
-            this.$router.push({name: 'Room', params: {id: this.room.id}})
+            if (this.room?.game?.round > 0) {
+                this.$router.push({name: 'Game', params: {id: this.room.id}})
+            } else {
+                this.$router.push({name: 'Room', params: {id: this.room.id}})
+            }
+            
         }
     }
 });

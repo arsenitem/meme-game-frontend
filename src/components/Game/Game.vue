@@ -3,9 +3,9 @@
     <h2 class="roundQuestion">{{ session.game.activeQuestion.text }}</h2>
     <div class="row" style="height: 65vh">
       <div class="col" style="border: 2px solid">
-        <div v-if="preview">
+        <!-- <div v-if="preview">
           <img :src="preview" height="400" width="400" class="preview" />
-        </div>
+        </div> -->
         <div
           v-for="card in pickedCards"
           :key="card.id"
@@ -15,9 +15,9 @@
           <div v-if="roundStatus === 'voting' || roundStatus === 'beforeRound'">
             <img
               :src="card.link"
-              height="240"
-              width="150"
-              @mouseover="show(card)"
+              :height="preview === card.id ? 400 :240"
+              :width="preview === card.id ? 400 :240"
+              @mouseover="show(card.id)"
               @mouseleave="clear"
             />
             <div>{{ card.votes }}</div>
@@ -116,8 +116,8 @@ export default defineComponent({
         cardId,
       });
     },
-    show(card: any) {
-      this.preview = card.link;
+    show(cardId: string) {
+      this.preview = cardId;
     },
     clear() {
       this.preview = null;
