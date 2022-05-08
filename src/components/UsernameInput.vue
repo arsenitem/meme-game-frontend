@@ -2,7 +2,7 @@
   <div class="username-input-block">
     <div class="row justify-content-md-center mt-5">
       <div class="col-md-8">
-        <h1>Добро пожаловать в мем гейм</h1>
+        <h1>Добро пожаловать в игру Мемер!</h1>
       </div>
     </div>
     <div class="row justify-content-md-center mt-5">
