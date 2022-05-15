@@ -10,9 +10,6 @@
   
 </template>
 
-<style>
-
-</style>
 <script lang="ts">
 import { defineComponent } from 'vue'
 export default defineComponent({
@@ -29,3 +26,16 @@ export default defineComponent({
   }
 })
 </script>
+
+<style>
+  #app {
+    font-family: 'Press Start 2P', cursive;
+  }
+  .form-control:focus {
+    color: #212529;
+    background-color: #fff;
+    border-color: #ffc107;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgb(255 193 7 / 25%);
+}
+</style>

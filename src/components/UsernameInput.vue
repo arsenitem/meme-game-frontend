@@ -1,6 +1,8 @@
 <template>
   <div class="username-input-block">
-    <div class="row justify-content-md-center mt-5">
+    <div class="input-form">
+      <form @submit.prevent="onContineClick">
+        <div class="row justify-content-md-center">
       <div class="col-md-8">
         <h1>Добро пожаловать в игру Мемер!</h1>
       </div>
@@ -13,8 +15,8 @@
     <div class="row justify-content-md-center mt-5">
       <div class="col-md-5">
         <div class="input-group">
-          <span class="input-group-text" id="basic-addon1">@</span>
           <input
+            ref="usernameInput"
             type="text"
             class="form-control"
             placeholder="Имя игрока"
@@ -24,9 +26,11 @@
       </div>
     </div>
     <div class="row justify-content-md-center mt-5">
-      <div class="col-md-2 align-self-center">
-        <button type="button" class="btn btn-warning" :disabled='btnDisabled' @click="onContineClick" style="width:100%">Продолжить</button>
+      <div class="col-md-3 align-self-center">
+        <input type="submit" class="btn btn-warning" :disabled='btnDisabled' style="width:100%" value="Продолжить">
       </div>
+    </div>
+      </form>
     </div>
   </div>
   
@@ -52,6 +56,7 @@ export default defineComponent({
       this.$store.commit('setUser', player);
       this.$router.push({name: 'RoomsList'});
     });
+    this.$refs.usernameInput.focus();
   },
   methods: {
       onContineClick() {
@@ -65,10 +70,29 @@ export default defineComponent({
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+.username-input-block {
+  height: 100%;
+}
+.username-input-block::before {
+  content: '';
+  position: absolute;
+  opacity: 0.25;
+  z-index: -1000;
+  width: 100%;
+  height: 100%;
+  background: url('http://artismedia.by/blog/wp-content/uploads/2018/06/in-blog-2.png');
+  background-size: cover;
+}
 .username-input-block h1 {
   text-align: center;
 }
 .username-input-block h3 {
   text-align: center;
+}
+.input-form {
+  margin-top: 100px;
+  position: absolute;
+  width: 100%;
 }
 </style>

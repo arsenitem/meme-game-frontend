@@ -5,6 +5,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/',
         name: 'UsernameInput',
         component: () => import('../components/UsernameInput.vue'),
+        beforeEnter: routeGuards.enterUsernameInput,
     },
     {
         path: '/rooms',

@@ -6,7 +6,7 @@
           <div class="card-body">
             <div class="row justify-content-center">
               <div class="col-md-4">
-                <button class="btn btn-primary" @click="onCreateRoomClick">
+                <button class="btn btn-warning" @click="onCreateRoomClick">
                   Создать комнату
                 </button>
               </div>

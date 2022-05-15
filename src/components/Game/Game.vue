@@ -1,29 +1,41 @@
 <template>
   <div v-if="session">
     <h2 class="roundQuestion">{{ session.game.activeQuestion.text }}</h2>
-    <div class="row" style="height: 65vh">
+    <div class="row" style="height: 55vh">
       <div class="col" style="border: 2px solid">
-        <!-- <div v-if="preview">
-          <img :src="preview" height="400" width="400" class="preview" />
-        </div> -->
         <div
           v-for="card in pickedCards"
           :key="card.id"
           class="pickedCard"
           @click="onVoteCardClick(card.id)"
         >
+        <!-- <div class="flip-container">
+            <div class="flipper">
+              <div class="front">
+                <img
+                  v-if="roundStatus === 'voting' || roundStatus === 'beforeRound'"
+                  :src="card.link"
+                  :height="preview === card.id ? 400 : 240"
+                  :width="preview === card.id ? 400 : 180"
+                  @mouseover="show(card.id)"
+                  @mouseleave="clear"
+                />
+              </div>
+              <div class="back">
+                <div class="pickedCard"></div>
+              </div>
+              <div v-if="roundStatus === 'voting'">{{ card.votes }}</div>
+            </div>
+          </div> -->
           <div v-if="roundStatus === 'voting' || roundStatus === 'beforeRound'">
             <img
               :src="card.link"
-              :height="preview === card.id ? 400 :240"
-              :width="preview === card.id ? 400 :240"
+              :height="preview === card.id ? 400 : 240"
+              :width="preview === card.id ? 400 : 180"
               @mouseover="show(card.id)"
               @mouseleave="clear"
             />
-            <div>{{ card.votes }}</div>
-          </div>
-          <div v-if="roundStatus === 'picking'">
-            <!-- <img height="160" width="100"> -->
+            <div v-if="roundStatus === 'voting'">{{ card.votes }}</div>
           </div>
         </div>
       </div>
@@ -148,7 +160,7 @@ export default defineComponent({
 
 <style>
 .pickedCard {
-  width: 150px;
+  width: 180px;
   height: 240px;
   float: left;
   background-color: gainsboro;
@@ -160,6 +172,6 @@ export default defineComponent({
   margin-left: 300px;
 }
 .roundQuestion {
-    height: 60px;
+  padding: 10px;
 }
 </style>
