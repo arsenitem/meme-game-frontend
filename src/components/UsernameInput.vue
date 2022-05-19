@@ -54,7 +54,12 @@ export default defineComponent({
   mounted() {
     this.$socket.on("player:created", (player: any) => {
       this.$store.commit('setUser', player);
-      this.$router.push({name: 'RoomsList'});
+      if (this.$route.query.id) {
+        this.$socket.emit('player:join', {sessionId: this.$route.query.id});
+        this.$router.push({name: 'Room', params: {id: this.$route.query.id}});
+      } else {
+        this.$router.push({name: 'RoomsList'});
+      }
     });
     this.$refs.usernameInput.focus();
   },

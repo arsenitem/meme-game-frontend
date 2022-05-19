@@ -58,7 +58,9 @@ export default defineComponent({
     created() {
         this.$socket.on("session:status", (session: any) => {
             this.session = session;
-            console.log('status', session)
+            if (this.session.game.round > 0) {
+                this.$router.push({name: 'Game'});
+            }
         });
         this.$socket.on("session:started", () => {
             this.$router.push({name: 'Game'});
