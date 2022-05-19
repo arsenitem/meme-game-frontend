@@ -19,11 +19,6 @@ export default defineComponent({
       return this.$store.getters["user"];
     },
   },
-  mounted() {
-  },
-  beforeUnmout() {
-    localStorage.removeItem('userName');
-  }
 })
 </script>
 

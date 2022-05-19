@@ -1,9 +1,7 @@
 import { createStore } from 'vuex'
-import socket from '../socket';
 
 export default createStore({
   state: {
-    username: '',
     user: {},
   },
   getters: {
@@ -13,7 +11,5 @@ export default createStore({
       setUser: (state, user) => state.user = user,
   },
   actions: {
-    // updateUsername:({commit}, payload) => {
-    // },
   },
 })

@@ -7,35 +7,8 @@
         </div>
         <div class="row">
           <div class="game-field" style="border: 2px solid">
-            <div
-              v-for="card in pickedCards"
-              :key="card.id"
-              class="card picked-card"
-              data-toggle="modal"
-              data-target="#exampleModalCenter"
-            >
-              <div class="card__wrapper">
-                <div
-                  class="card__side card-front"
-                  v-if="roundStatus === 'picking'"
-                ></div>
-                <div
-                  class="card__side card-back"
-                  v-if="
-                    roundStatus === 'voting' || roundStatus === 'beforeRound'
-                  "
-                >
-                  <img
-                    @click="onCardView(card)"
-                    :src="card.link"
-                    height="240"
-                    width="180"
-                  />
-                </div>
-              </div>
-              <div v-if="roundStatus === 'voting'" class="votes-count">
-                {{ card.votes }}
-              </div>
+            <div v-for="card in pickedCards" :key="card.id">
+              <PickedCard :card="card" :roundStatus="roundStatus" @view="viewCard"/>
             </div>
           </div>
         </div>
@@ -43,14 +16,13 @@
       <div class="col-md-3 mt-4">
         <h4>Раунд {{ round }}</h4>
         <h4>{{ roundStatusMap[roundStatus] }}({{ remainingTime }})</h4>
-        <players-list :players="playersList" />
+        <PlayersList :players="playersList" />
       </div>
     </div>
     <div class="row ml-4">
-      <user-cards :cards="cardsList" @cardPick="onCardPick" />
+      <UserCards :cards="cardsList" @cardPick="onCardPick" />
     </div>
-    <!-- Modal -->
-    <CustomModal
+    <PreviewCard
       :showModal="showModal"
       :tittle="session.game.activeQuestion.text"
       :card="previewCard"
@@ -65,23 +37,24 @@
 import { defineComponent } from "vue";
 import UserCards from "./UserCards.vue";
 import PlayersList from "./PlayersList.vue";
-import CustomModal from "../CustomModal.vue";
+import PickedCard from "./PickedCard.vue";
+import PreviewCard from "../modals/PreviewCard.vue";
 export default defineComponent({
   inject: ["$socket"],
   components: {
     UserCards,
     PlayersList,
-    CustomModal,
+    PickedCard,
+    PreviewCard,
   },
   data() {
     return {
       voted: false,
       showModal: false,
+      previewCard: false,
       session: null,
-      cardPicked: false,
       remainingTime: 60,
       timer: null,
-      previewCard: null,
       statusTimeMap: {
         picking: "roundTime",
         voting: "voteTime",
@@ -91,7 +64,7 @@ export default defineComponent({
         picking: "Выбор карт",
         voting: "Голосование",
         beforeRound: "Ожидание следующего раунда",
-      }
+      },
     };
   },
   computed: {
@@ -143,6 +116,10 @@ export default defineComponent({
         cardId,
       });
     },
+    closeModal() {
+      this.showModal = false;
+      this.previewCard = null;
+    },
     voteCard(cardId: string) {
       this.$socket.emit("session:voteCard", {
         sessionId: this.sessionId,
@@ -151,23 +128,15 @@ export default defineComponent({
       this.closeModal();
       this.voted = true;
     },
-    onCardView(card: any) {
+    viewCard(card: any) {
       this.showModal = true;
       this.previewCard = card;
-    },
-    clear() {
-      this.previewCard = null;
-    },
-    closeModal() {
-      this.showModal = false;
-      this.previewCard = null;
-    },
+    }
   },
   created() {
     this.$nextTick(() => {
       this.$socket.on("session:status", (session: any) => {
         this.session = session;
-        console.log("status", session);
       });
     });
   },
@@ -175,7 +144,7 @@ export default defineComponent({
     this.$socket.emit("session:getStatus", { sessionId: this.sessionId });
   },
   unmounted() {
-    //this.$socket.removeListener("session:status");
+    this.$socket.removeListener("session:status");
   },
 });
 </script>
@@ -184,93 +153,14 @@ export default defineComponent({
 .game {
   font-family: cursive;
 }
-.votes-count {
-  position: absolute;
-  bottom: -30px;
-}
 .game-field {
   height: 55vh;
   border: 2px solid;
   display: flex;
   flex-wrap: wrap;
 }
-.picked-card {
-  width: 192px;
-  height: 252px;
-  float: left;
-  background-color: gainsboro;
-  padding: 5px;
-  margin: 15px;
-}
-.preview {
-  position: absolute;
-  margin-left: 300px;
-}
 .roundQuestion {
   padding: 10px;
   padding-left: 30px;
-}
-.card {
-  perspective: 600px;
-  position: relative;
-}
-.card.is-switched.card__wrapper {
-  animation: rotate 0.5s linear both;
-}
-.card__wrapper {
-  transform-style: preserve-3d;
-  animation: rotate-inverse 0.5s linear both;
-}
-.card__side {
-  backface-visibility: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-.card-back {
-  transform-style: preserve-3d;
-  animation: rotate-inverse 0.5s linear both;
-}
-@keyframes rotate {
-  0% {
-    transform: rotateY(0);
-  }
-  70% {
-    transform: rotateY(200deg);
-  }
-  100% {
-    transform: rotateY(180deg);
-  }
-}
-
-@keyframes rotate-inverse {
-  0% {
-    transform: rotateY(180deg);
-  }
-  70% {
-    transform: rotateY(-20deg);
-  }
-  100% {
-    transform: rotateY(0);
-  }
-}
-::v-deep .modal-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-::v-deep .modal-content {
-  display: flex;
-  flex-direction: column;
-  margin: 0 1rem;
-  padding: 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.25rem;
-  background: #fff;
-}
-.modal__title {
-  font-size: 1.5rem;
-  font-weight: 700;
 }
 </style>

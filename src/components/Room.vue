@@ -19,9 +19,6 @@
                     <div class="row">
                         <button class="btn btn-warning" @click="onGameStart" v-if="isHost">Начать игру</button>
                     </div>
-                    <div class="row">
-                        <button class="btn btn-primary" @click="onGameJoin" v-show="btnVisible">Присоединиться к игре</button>
-                    </div>
                 </div>
          </div>
     </div>
@@ -34,7 +31,6 @@ export default defineComponent({
     data() {
         return {
             session: null,
-            btnVisible: false,
         }
     },
     computed: {

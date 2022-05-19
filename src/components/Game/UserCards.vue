@@ -27,13 +27,6 @@ export default defineComponent({
       preview: "",
     };
   },
-  computed: {},
-  mounted() {
-    // axios.get('https://meme-api.herokuapp.com/gimme/10').then(({data}) => {
-    //     console.log(data)
-    //     this.cards = data.memes
-    // })
-  },
   methods: {
     show(card: any) {
       this.preview = card.link;
