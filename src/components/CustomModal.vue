@@ -10,7 +10,7 @@
       </div>
       <div class="modal__action">
         <button @click="onCloseClick">Закрыть</button>
-        <button @click="onVoteClick">Проголосовать</button>
+        <button @click="onVoteClick" v-if="showVoteBtn">Проголосовать</button>
       </div>
     </vue-final-modal>
   </div>
@@ -27,7 +27,7 @@ export default {
         this.show = val;
     }
   },
-  props: ['showModal', 'tittle','card'],
+  props: ['showModal', 'tittle','card', 'showVoteBtn'],
   methods: {
       onCloseClick() {
         this.$emit('close');

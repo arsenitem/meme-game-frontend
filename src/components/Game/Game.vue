@@ -54,6 +54,7 @@
       :showModal="showModal"
       :tittle="session.game.activeQuestion.text"
       :card="previewCard"
+      :showVoteBtn="!voted"
       @close="closeModal"
       @vote="voteCard"
     />
@@ -74,6 +75,7 @@ export default defineComponent({
   },
   data() {
     return {
+      voted: false,
       showModal: false,
       session: null,
       cardPicked: false,
@@ -130,6 +132,7 @@ export default defineComponent({
       if (cards.length === 0) {
         this.previewCard = null;
         this.showModal = false;
+        this.voted = false;
       }
     },
   },
@@ -146,6 +149,7 @@ export default defineComponent({
         cardId,
       });
       this.closeModal();
+      this.voted = true;
     },
     onCardView(card: any) {
       this.showModal = true;
@@ -168,13 +172,7 @@ export default defineComponent({
     });
   },
   mounted() {
-    console.log("get session status");
-    console.log(this.$socket);
     this.$socket.emit("session:getStatus", { sessionId: this.sessionId });
-    // this.$socket.on("session:status", (session: any) => {
-    //     this.session = session;
-    //     console.log('status', session)
-    // });
   },
   unmounted() {
     //this.$socket.removeListener("session:status");
