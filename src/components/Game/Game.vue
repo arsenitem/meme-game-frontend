@@ -1,53 +1,62 @@
 <template>
-  <div v-if="session">
-    <h2 class="roundQuestion">{{ session.game.activeQuestion.text }}</h2>
-    <div class="row" style="height: 55vh">
-      <div class="col" style="border: 2px solid">
-        <div
-          v-for="card in pickedCards"
-          :key="card.id"
-          class="pickedCard"
-          @click="onVoteCardClick(card.id)"
-        >
-        <!-- <div class="flip-container">
-            <div class="flipper">
-              <div class="front">
-                <img
-                  v-if="roundStatus === 'voting' || roundStatus === 'beforeRound'"
-                  :src="card.link"
-                  :height="preview === card.id ? 400 : 240"
-                  :width="preview === card.id ? 400 : 180"
-                  @mouseover="show(card.id)"
-                  @mouseleave="clear"
-                />
+  <div v-if="session" class="game">
+    <div class="row">
+      <div class="col">
+        <div class="row">
+          <h3 class="roundQuestion">{{ session.game.activeQuestion.text }}</h3>
+        </div>
+        <div class="row">
+          <div class="game-field" style="border: 2px solid">
+            <div
+              v-for="card in pickedCards"
+              :key="card.id"
+              class="card picked-card"
+              data-toggle="modal"
+              data-target="#exampleModalCenter"
+            >
+              <div class="card__wrapper">
+                <div
+                  class="card__side card-front"
+                  v-if="roundStatus === 'picking'"
+                ></div>
+                <div
+                  class="card__side card-back"
+                  v-if="
+                    roundStatus === 'voting' || roundStatus === 'beforeRound'
+                  "
+                >
+                  <img
+                    @click="onCardView(card)"
+                    :src="card.link"
+                    height="240"
+                    width="180"
+                  />
+                </div>
               </div>
-              <div class="back">
-                <div class="pickedCard"></div>
+              <div v-if="roundStatus === 'voting'" class="votes-count">
+                {{ card.votes }}
               </div>
-              <div v-if="roundStatus === 'voting'">{{ card.votes }}</div>
             </div>
-          </div> -->
-          <div v-if="roundStatus === 'voting' || roundStatus === 'beforeRound'">
-            <img
-              :src="card.link"
-              :height="preview === card.id ? 400 : 240"
-              :width="preview === card.id ? 400 : 180"
-              @mouseover="show(card.id)"
-              @mouseleave="clear"
-            />
-            <div v-if="roundStatus === 'voting'">{{ card.votes }}</div>
           </div>
         </div>
       </div>
-      <div class="col-md-3">
-        <h2>Раунд {{ round }}</h2>
-        <h2>{{ roundStatus }}({{ remainingTime }})</h2>
+      <div class="col-md-3 mt-4">
+        <h4>Раунд {{ round }}</h4>
+        <h4>{{ roundStatusMap[roundStatus] }}({{ remainingTime }})</h4>
         <players-list :players="playersList" />
       </div>
     </div>
     <div class="row ml-4">
       <user-cards :cards="cardsList" @cardPick="onCardPick" />
     </div>
+    <!-- Modal -->
+    <CustomModal
+      :showModal="showModal"
+      :tittle="session.game.activeQuestion.text"
+      :card="previewCard"
+      @close="closeModal"
+      @vote="voteCard"
+    />
   </div>
 </template>
 
@@ -55,24 +64,32 @@
 import { defineComponent } from "vue";
 import UserCards from "./UserCards.vue";
 import PlayersList from "./PlayersList.vue";
+import CustomModal from "../CustomModal.vue";
 export default defineComponent({
   inject: ["$socket"],
   components: {
     UserCards,
     PlayersList,
+    CustomModal,
   },
   data() {
     return {
+      showModal: false,
       session: null,
       cardPicked: false,
       remainingTime: 60,
       timer: null,
-      preview: null,
+      previewCard: null,
       statusTimeMap: {
         picking: "roundTime",
         voting: "voteTime",
         beforeRound: "beforeNextRoundTime",
       },
+      roundStatusMap: {
+        picking: "Выбор карт",
+        voting: "Голосование",
+        beforeRound: "Ожидание следующего раунда",
+      }
     };
   },
   computed: {
@@ -111,7 +128,8 @@ export default defineComponent({
     },
     pickedCards(cards) {
       if (cards.length === 0) {
-        this.preview = null;
+        this.previewCard = null;
+        this.showModal = false;
       }
     },
   },
@@ -122,17 +140,23 @@ export default defineComponent({
         cardId,
       });
     },
-    onVoteCardClick(cardId: string) {
+    voteCard(cardId: string) {
       this.$socket.emit("session:voteCard", {
         sessionId: this.sessionId,
         cardId,
       });
+      this.closeModal();
     },
-    show(cardId: string) {
-      this.preview = cardId;
+    onCardView(card: any) {
+      this.showModal = true;
+      this.previewCard = card;
     },
     clear() {
-      this.preview = null;
+      this.previewCard = null;
+    },
+    closeModal() {
+      this.showModal = false;
+      this.previewCard = null;
     },
   },
   created() {
@@ -159,9 +183,22 @@ export default defineComponent({
 </script>
 
 <style>
-.pickedCard {
-  width: 180px;
-  height: 240px;
+.game {
+  font-family: cursive;
+}
+.votes-count {
+  position: absolute;
+  bottom: -30px;
+}
+.game-field {
+  height: 55vh;
+  border: 2px solid;
+  display: flex;
+  flex-wrap: wrap;
+}
+.picked-card {
+  width: 192px;
+  height: 252px;
   float: left;
   background-color: gainsboro;
   padding: 5px;
@@ -173,5 +210,69 @@ export default defineComponent({
 }
 .roundQuestion {
   padding: 10px;
+  padding-left: 30px;
+}
+.card {
+  perspective: 600px;
+  position: relative;
+}
+.card.is-switched.card__wrapper {
+  animation: rotate 0.5s linear both;
+}
+.card__wrapper {
+  transform-style: preserve-3d;
+  animation: rotate-inverse 0.5s linear both;
+}
+.card__side {
+  backface-visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+.card-back {
+  transform-style: preserve-3d;
+  animation: rotate-inverse 0.5s linear both;
+}
+@keyframes rotate {
+  0% {
+    transform: rotateY(0);
+  }
+  70% {
+    transform: rotateY(200deg);
+  }
+  100% {
+    transform: rotateY(180deg);
+  }
+}
+
+@keyframes rotate-inverse {
+  0% {
+    transform: rotateY(180deg);
+  }
+  70% {
+    transform: rotateY(-20deg);
+  }
+  100% {
+    transform: rotateY(0);
+  }
+}
+::v-deep .modal-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+::v-deep .modal-content {
+  display: flex;
+  flex-direction: column;
+  margin: 0 1rem;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  background: #fff;
+}
+.modal__title {
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 </style>
